@@ -1,39 +1,51 @@
 import React, {useEffect, useState} from 'react';
-import { Link } from 'react-router-dom';
-import axios from 'axios';
+import { Link, Redirect } from 'react-router-dom';
 import useFetch from '../../hooks/useFetch';
+import useLocalStorage from '../../hooks/useLocalStorage';
 
-const Authentication = () => {
+const Authentication = props => {
+
+  const isLogin = props.match.path === '/login';
+  const pageTitle = isLogin ? 'Sign In' : 'Sign Up';
+  const descriptionLink = isLogin ? '/register' : './login';
+  const descriptionText = isLogin ? 'Need an account?' : 'Have an account?';
+  const apiURl = isLogin ?  '/users/login' :  '/users';
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [isSubmiting, setSubmiting] = useState(false);
-  const [{isLoading, response, error}] = useFetch('/users/login');
+  const [username, setUserName] = useState('');
+  const [isSuccessfullSubmit, setSuccessfullSubmit] = useState(false);
 
-  const handleSubmit = () => {
-    setSubmiting(true)
+  //custome hooks
+  const [{isLoading, response, error}, doFetch ] = useFetch(apiURl);
+  const [token, setToken] = useLocalStorage('token');
+
+
+  const handleSubmit = event => {
+    event.preventDefault();
+    const user = isLogin ? {email, password} : {email, password, username};
+    doFetch({
+      method: 'POST',
+      data: {
+        user
+      }
+    })
   };
 
-  // useEffect(() => {
-  //   isSubmiting && axios('https://conduit.productionready.io/api/users/login', {
-  //     method: 'POST',
-  //     data: {
-  //       user: {
-  //         email: 'dsds@dds.fdf',
-  //         password: 'dsdsd'
-  //       }
-  //     }
-  //   })
-  //     .then(resp => {
-  //       setSubmiting(false);
-  //       console.log(resp);
-  //     })
-  //     .catch(err => {
-  //       console.log(err);
-  //       setSubmiting(false)
-  //     })
-  //
-  // });
+  useEffect(() =>{
+    if(!response){
+      return;
+    };
+    //установка в localStorage через hook useLocalStorage
+    setToken(response.user.token);
+    //взводим флаг, что данные успешно получены
+    setSuccessfullSubmit(true);
+  }, [response, setToken]);
+
+  //redirect to main page if register is success
+  if(isSuccessfullSubmit){
+    return <Redirect to='/' />
+  };
 
   return (
     <div className="auth-page">
@@ -41,13 +53,26 @@ const Authentication = () => {
         <div className="row">
           <div className="col-md-6 offset-3 col-xs-12">
             <h2 className="text-xs-center">
-              Login
+              {pageTitle}
             </h2>
             <p className="text-xs-center">
-              <Link to="register">Need an account?</Link>
+              <Link to={descriptionLink}>{descriptionText}</Link>
             </p>
             <form action="#" onSubmit={handleSubmit}>
               <fieldset>
+                {
+                  !isLogin && (
+                      <fieldset className="form-group">
+                        <input
+                            type="text"
+                            className="form-control form-control-lg"
+                            placeholder="UserName"
+                            value={username}
+                            onChange={e => setUserName(e.target.value)}
+                        />
+                      </fieldset>
+                  )
+                }
                 <fieldset className="form-group">
                   <input
                     type="email"
@@ -71,7 +96,7 @@ const Authentication = () => {
                   type="submit"
                   disabled={isLoading}
                 >
-                  Sing in
+                  {pageTitle}
                 </button>
               </fieldset>
             </form>
