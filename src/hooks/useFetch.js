@@ -21,8 +21,9 @@ export default url => {
         setResponse(resp.data);
       })
       .catch(err => {
+
         setIsLoading(false);
-        setError(err.response.data)
+        setError(err.response.data.errors)
       })
 
   }, [isLoading, options, url]);

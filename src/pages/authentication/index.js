@@ -1,7 +1,9 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useContext} from 'react';
 import { Link, Redirect } from 'react-router-dom';
 import useFetch from '../../hooks/useFetch';
 import useLocalStorage from '../../hooks/useLocalStorage';
+import { CurrentUserContext } from "../../contexts/currectUser";
+import BackendErrorMessages from "../../components/BackendErrorMessages";
 
 const Authentication = props => {
 
@@ -15,11 +17,11 @@ const Authentication = props => {
   const [password, setPassword] = useState('');
   const [username, setUserName] = useState('');
   const [isSuccessfullSubmit, setSuccessfullSubmit] = useState(false);
+  const [, setCurrentUserState] = useContext(CurrentUserContext);
 
   //custome hooks
   const [{isLoading, response, error}, doFetch ] = useFetch(apiURl);
-  const [token, setToken] = useLocalStorage('token');
-
+  const [, setToken] = useLocalStorage('token');
 
   const handleSubmit = event => {
     event.preventDefault();
@@ -38,14 +40,23 @@ const Authentication = props => {
     };
     //установка в localStorage через hook useLocalStorage
     setToken(response.user.token);
-    //взводим флаг, что данные успешно получены
-    setSuccessfullSubmit(true);
+    //устанавливаем новое значение в нашем контексте
+    setCurrentUserState(state => {
+      return{
+        ...state,
+        isLoading: false,
+        isLoggedIn: true,
+        currentUser: response.user
+      }
+    });
   }, [response, setToken]);
 
   //redirect to main page if register is success
   if(isSuccessfullSubmit){
     return <Redirect to='/' />
   };
+
+  // console.log(error, '11111111111');
 
   return (
     <div className="auth-page">
@@ -59,6 +70,10 @@ const Authentication = props => {
               <Link to={descriptionLink}>{descriptionText}</Link>
             </p>
             <form action="#" onSubmit={handleSubmit}>
+              {
+                error &&
+                    <BackendErrorMessages backendErrors={error} />
+              }
               <fieldset>
                 {
                   !isLogin && (
