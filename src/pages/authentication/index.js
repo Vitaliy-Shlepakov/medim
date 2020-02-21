@@ -16,8 +16,9 @@ const Authentication = props => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [username, setUserName] = useState('');
-  const [isSuccessfullSubmit, setSuccessfullSubmit] = useState(false);
+  const [isSuccessfullSubmit] = useState(false);
   const [, setCurrentUserState] = useContext(CurrentUserContext);
+
 
   //custome hooks
   const [{isLoading, response, error}, doFetch ] = useFetch(apiURl);
@@ -49,7 +50,7 @@ const Authentication = props => {
         currentUser: response.user
       }
     });
-  }, [response, setToken]);
+  }, [response, setToken, setCurrentUserState]);
 
   //redirect to main page if register is success
   if(isSuccessfullSubmit){
@@ -102,6 +103,7 @@ const Authentication = props => {
                     type="password"
                     className="form-control form-control-lg"
                     placeholder="Password"
+                    autoComplete="password"
                     value={password}
                     onChange={e => setPassword(e.target.value)}
                   />
