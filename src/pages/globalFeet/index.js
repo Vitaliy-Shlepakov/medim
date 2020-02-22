@@ -4,6 +4,9 @@ import useFetch from '../../hooks/useFetch';
 import Pagination from "../../components/Pagination";
 import { getPaginator, limit } from "../../utils";
 import { stringify } from "query-string";
+import PopularTags from "../../components/PopularTags";
+import Loading from "../../components/Loading";
+import ErrorMessage from "../../components/ErrorMessage";
 
 const GlobalFeet = props => {
     //формируем строку запроса
@@ -31,8 +34,8 @@ const GlobalFeet = props => {
             <div className="container page">
                 <div className="row">
                     <div className="col-md-9">
-                        { isLoading && <div>Loading ...</div> }
-                        { error && <div>Some error happened ...</div> }
+                        { isLoading && <Loading/> }
+                        { error && <ErrorMessage/> }
                         { !isLoading && response &&
                             <>
                                 <Feed articles={response.articles}/>
@@ -46,7 +49,9 @@ const GlobalFeet = props => {
                         }
                     </div>
                     <div className="col-md-3">
-                        Popular tags
+                        <PopularTags
+
+                        />
                     </div>
                 </div>
             </div>
