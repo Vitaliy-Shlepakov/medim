@@ -18,7 +18,6 @@ const PopularTags = () => {
     if(error){
         return <ErrorMessage/>
     };
-    console.log(response, 'response');
 
     return(
         <div className="sidebar">
