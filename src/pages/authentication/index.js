@@ -17,7 +17,7 @@ const Authentication = props => {
   const [password, setPassword] = useState('');
   const [username, setUserName] = useState('');
   const [isSuccessfullSubmit, setSuccessfullSubmit] = useState(false);
-  const [, setCurrentUserState] = useContext(CurrentUserContext);
+  const [, dispatch] = useContext(CurrentUserContext);
 
 
   //custome hooks
@@ -39,19 +39,17 @@ const Authentication = props => {
     if(!response){
       return;
     };
+
     //установка в localStorage через hook useLocalStorage
     setToken(response.user.token);
-    //устанавливаем новое значение в нашем контексте
-    setCurrentUserState(state => {
-      return{
-        ...state,
-        isLoading: false,
-        isLoggedIn: true,
-        currentUser: response.user
-      }
+
+    //устанавливаем (диспатчим) новое значение в нашем контексте
+    dispatch({
+      type: 'SET_AUTHORIZED',
+      payload: response.user
     });
     setSuccessfullSubmit(true);
-  }, [response, setToken, setCurrentUserState]);
+  }, [response, setToken, dispatch]);
 
   //redirect to main page if register is success
   if(isSuccessfullSubmit){

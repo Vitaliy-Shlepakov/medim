@@ -5,36 +5,33 @@ import useLocalStorage from "../../hooks/useLocalStorage";
 
 const CurrentUserChecker = ({children}) => {
     const [{response}, doFetch] = useFetch('/user');
-    const [, setCurrentUserState] = useContext(CurrentUserContext);
+    const [, dispatch] = useContext(CurrentUserContext);
     const [token] = useLocalStorage('token')
 
     useEffect(() => {
 
         if(!token){
-            setCurrentUserState(state => ({
-                ...state,
-                isLoggedIn: false
-            }))
+            dispatch({
+                type: 'SET_UNAUTHORIZED',
+            })
         };
 
         doFetch();
-        setCurrentUserState(state => ({
-            ...state,
-            isLoading: true
-        }))
-    }, [doFetch, setCurrentUserState, token]);
+        dispatch({
+            type: 'LOADING'
+        });
+
+    }, [doFetch, dispatch, token]);
 
     useEffect(() => {
         if(!response) {return}
 
-        setCurrentUserState(state => ({
-            ...state,
-            isLoggedIn: true,
-            isLoading: false,
-            currentUser: response.user
-        }));
+        dispatch({
+            type: 'SET_AUTHORIZED',
+            payload: response.user
+        })
 
-    }, [response, setCurrentUserState]);
+    }, [response, dispatch]);
 
     return children;
 };

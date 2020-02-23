@@ -4,6 +4,7 @@ import TagFeed from './tagFeed';
 import YourFeed from './yourFeed';
 import Authentication from './authentication';
 import Article from './article';
+import CreateArticle from './createArticle';
 import React from 'react';
 
 export default () => {
@@ -11,11 +12,11 @@ export default () => {
     <Switch>
       <Route path='/' component={GlobalFeed} exact/>
       <Route path='/feed' component={YourFeed}/>
-      <Route path='/feed' component={YourFeed}/>
-      <Route path='/tags/:slug' component={TagFeed} exact/>
-      <Route path='/articles/:slug' component={Article} exact/>
-      <Route path='/login' component={Authentication} exact/>
-      <Route path='/register' component={Authentication} exact/>
+      <Route path='/tags/:slug' component={TagFeed}/>
+        <Route path='/articles/new' component={CreateArticle}/>
+        <Route path='/articles/:slug' component={Article}/>
+      <Route path='/login' component={Authentication}/>
+      <Route path='/register' component={Authentication}/>
     </Switch>
   )
 };
