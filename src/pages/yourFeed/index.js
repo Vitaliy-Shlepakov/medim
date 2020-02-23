@@ -7,15 +7,16 @@ import { stringify } from "query-string";
 import PopularTags from "../../components/PopularTags";
 import Loading from "../../components/Loading";
 import ErrorMessage from "../../components/ErrorMessage";
+import FeedToggler from "../../components/FeedToggler";
 
-const GlobalFeet = props => {
+const YourFeet = props => {
     //формируем строку запроса
     const {currentPage, offset} = getPaginator(props.location.search);
     const stringifiedParams = stringify({
         limit,
         offset
     });
-    const apiUrl = `/articles?${stringifiedParams}`;
+    const apiUrl = `/articles/feed?${stringifiedParams}`;
     const url = props.match.url;
     const [{response, isLoading, error}, doFetch] = useFetch(apiUrl);
 
@@ -31,7 +32,11 @@ const GlobalFeet = props => {
                     <p>A place to share knowledge</p>
                 </div>
             </div>
+
             <div className="container page">
+                <FeedToggler
+                    tagName="foo"
+                />
                 <div className="row">
                     <div className="col-md-9">
                         { isLoading && <Loading/> }
@@ -60,4 +65,4 @@ const GlobalFeet = props => {
     );
 };
 
-export default GlobalFeet;
+export default YourFeet;

@@ -16,7 +16,7 @@ const Authentication = props => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [username, setUserName] = useState('');
-  const [isSuccessfullSubmit] = useState(false);
+  const [isSuccessfullSubmit, setSuccessfullSubmit] = useState(false);
   const [, setCurrentUserState] = useContext(CurrentUserContext);
 
 
@@ -50,6 +50,7 @@ const Authentication = props => {
         currentUser: response.user
       }
     });
+    setSuccessfullSubmit(true);
   }, [response, setToken, setCurrentUserState]);
 
   //redirect to main page if register is success
@@ -57,7 +58,6 @@ const Authentication = props => {
     return <Redirect to='/' />
   };
 
-  // console.log(error, '11111111111');
 
   return (
     <div className="auth-page">
