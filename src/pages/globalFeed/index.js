@@ -54,9 +54,7 @@ const GlobalFeet = props => {
                         }
                     </div>
                     <div className="col-md-3">
-                        <PopularTags
-
-                        />
+                        <PopularTags/>
                     </div>
                 </div>
             </div>
