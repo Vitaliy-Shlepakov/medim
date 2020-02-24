@@ -18,6 +18,7 @@ export default url => {
   }, []);
 
   useEffect(() => {
+    let skipGetResponseAfterDestroy = false;
     const requestOptions = {
       ...options,
       ...{
@@ -29,13 +30,22 @@ export default url => {
 
     isLoading && axios(`${baseUrl}${url}`, requestOptions)
       .then(resp => {
-        setIsLoading(false);
-        setResponse(resp.data);
+        if(!skipGetResponseAfterDestroy){
+          setIsLoading(false);
+          setResponse(resp.data);
+        }
       })
       .catch(err => {
-        setIsLoading(false);
-        setError(err.response.data.errors)
-      })
+        if(!skipGetResponseAfterDestroy){
+          setIsLoading(false);
+          setError(err.response.data.errors)
+        }
+      });
+
+      //вызовется когда компонент дестроится
+      return () => {
+        skipGetResponseAfterDestroy = true;
+      }
 
   }, [isLoading, options, url, token, baseUrl]);
 
