@@ -38,6 +38,12 @@ const Header = () => {
               currentUserState.isLoggedIn &&
                 <>
                 <li className="nav-item">
+                  <NavLink to="/settings" className="nav-link" exact>
+                    <i className="ion-gear-a"></i>
+                    &nbsp; Settings
+                  </NavLink>
+                </li>
+                <li className="nav-item">
                   <NavLink to="/articles/new" className="nav-link" exact>
                     <i className="ion-compose"></i>
                     &nbsp; New post
