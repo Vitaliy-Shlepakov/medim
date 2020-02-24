@@ -1,7 +1,7 @@
 import React, {useEffect, useState, useContext} from 'react';
 import ArticleForm from "../../components/ArticleForm";
 import useFetch from "../../hooks/useFetch";
-import Redirect from "react-router-dom/es/Redirect";
+import {Redirect} from "react-router-dom";
 import { CurrentUserContext } from "../../contexts/currectUser";
 
 const EditArticle = props => {

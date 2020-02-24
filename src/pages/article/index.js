@@ -1,52 +1,105 @@
-import React, { useEffect } from 'react';
+import React, {useEffect, useContext, useState} from 'react';
 import useFetch from '../../hooks/useFetch';
-import { Link } from "react-router-dom";
+import { Link, Redirect } from "react-router-dom";
 import Loading from "../../components/Loading";
 import ErrorMessage from "../../components/ErrorMessage";
 import TagList from "../../components/TagList";
+import { CurrentUserContext} from "../../contexts/currectUser";
 
 const Article = props => {
     const slug = props.match.params.slug;
     const apiUrl = `/articles/${slug}`;
-    const [{response, error, isLoading}, doFetch] = useFetch(apiUrl);
+    const [{
+        response: fetchArticleresponse,
+        error: fetchArticleError,
+        isLoading: fetchArticleIsLoading
+    }, doFetch] = useFetch(apiUrl);
+    const [{response: deleteArticleResponse}, doDeleteArticle] = useFetch(apiUrl);
+    const [currentUserState] = useContext(CurrentUserContext);
+    const [isSuccessfullDelete, setSuccessfullDelete] = useState(false);
+
+    //сравниваем текущего пользователя с автором статьи
+    const isAuthor = () => {
+        if(!fetchArticleresponse || !currentUserState.isLoggedIn){
+            return false;
+        };
+        return fetchArticleresponse.article.author.username === currentUserState.currentUser.username;
+    };
+
+    const deleteArticle = () => {
+        doDeleteArticle({
+            method: 'DELETE'
+        });
+    };
 
     useEffect(() => {
         doFetch();
     }, [doFetch]);
 
+    useEffect(() => {
+        if (!deleteArticleResponse) return;
+        setSuccessfullDelete(true);
+    }, [deleteArticleResponse]);
+
+    if(isSuccessfullDelete){
+        return <Redirect to={'/'}/>
+    }
+
     return (
         <div className="article-page">
             <div className="banner">
-                {!isLoading && response && (
+                {!fetchArticleIsLoading && fetchArticleresponse && (
                     <div className="container">
-                        <h1>{response.article.title}</h1>
+                        <h1>{fetchArticleresponse.article.title}</h1>
                         <div className="article-meta">
-                            <Link to={`/profiles/${response.article.author.username}`}>
-                                <img src={response.article.author.image} alt="#"/>
+                            <Link to={`/profiles/${fetchArticleresponse.article.author.username}`}>
+                                <img src={fetchArticleresponse.article.author.image} alt="#"/>
                             </Link>
                             <div className="info">
-                                <Link to={`/profiles/${response.article.author.username}`}>
-                                    { response.article.author.username }
+                                <Link to={`/profiles/${fetchArticleresponse.article.author.username}`}>
+                                    { fetchArticleresponse.article.author.username }
                                 </Link>
                                 <span className="date">
-                                    { response.article.createdAt }
+                                    { fetchArticleresponse.article.createdAt }
                                 </span>
+                                {
+                                    isAuthor() && (
+                                        <span>
+                                            <Link
+                                                className="btn btn-outline-secondary btn-sm"
+                                                to={`/srticles/${fetchArticleresponse.article.slug}/edit`}
+                                            >
+                                                <i className="ion-edit"></i>
+                                                &nbsp;
+                                                Edit Article
+                                            </Link>
+                                            <button
+                                                className="btn btn-outline-danger btn-sm"
+                                                onClick={deleteArticle}
+                                            >
+                                                <i className="ion-trash-a"></i>
+                                                &nbsp;
+                                                Delete article
+                                            </button>
+                                        </span>
+                                    )
+                                }
                             </div>
                         </div>
                     </div>
                 )}
             </div>
             <div className="container page">
-                { isLoading && <Loading/> }
-                { error && <ErrorMessage/> }
+                { fetchArticleIsLoading && <Loading/> }
+                { fetchArticleError && <ErrorMessage/> }
                 {
-                    !isLoading && response && (
+                    !fetchArticleIsLoading && fetchArticleresponse && (
                         <div className="row article-content">
                             <div className="col-xs-12">
                                 <div>
-                                    <p>{response.article.body}</p>
+                                    <p>{fetchArticleresponse.article.body}</p>
                                 </div>
-                                <TagList tags={response.article.tagList}/>
+                                <TagList tags={fetchArticleresponse.article.tagList}/>
                             </div>
 
                         </div>
